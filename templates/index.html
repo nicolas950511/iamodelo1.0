@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot con PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .chat-container {
+            width: 50%;
+            margin: 0 auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .chat-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .chat-button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .chat-button:hover {
+            background-color: #0056b3;
+        }
+        .chat-response {
+            margin-top: 20px;
+        }
+        .chat-images img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h2>Chatbot con PDF</h2>
+        <input type="text" id="question" class="chat-input" placeholder="Escribe tu pregunta...">
+        <button onclick="askQuestion()" class="chat-button">Enviar</button>
+        <button onclick="reloadPDF()" class="chat-button">Recargar PDF</button>
+        <div id="response" class="chat-response"></div>
+        <div id="images" class="chat-images"></div>
+    </div>
+    <script>
+        function askQuestion() {
+            const question = document.getElementById('question').value;
+            fetch('/answer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: question }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerText = data.answer;
+                const imagesDiv = document.getElementById('images');
+                imagesDiv.innerHTML = '';
+                data.images.forEach(image => {
+                    const img = document.createElement('img');
+                    img.src = '/images/' + image;
+                    imagesDiv.appendChild(img);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function reloadPDF() {
+            fetch('/reload', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.status);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
